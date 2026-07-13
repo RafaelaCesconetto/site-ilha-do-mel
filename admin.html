@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ilha do Mel — Painel Administrativo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          bark: '#17120D',
+          panel: '#221A12',
+          cell: '#2B2116',
+          line: '#3E3121',
+          gold: '#E3A33F',
+          goldDim: '#B87A2A',
+          cream: '#F5E6C8',
+          muted: '#B6A688',
+        },
+        fontFamily: {
+          display: ['Fraunces', 'serif'],
+          body: ['Work Sans', 'sans-serif'],
+          mono: ['JetBrains Mono', 'monospace'],
+        }
+      }
+    }
+  }
+</script>
+</head>
+<body class="bg-bark text-cream font-body min-h-screen">
+
+  <!-- HEADER -->
+  <header class="border-b border-line px-5 md:px-8 py-4 flex items-center justify-between sticky top-0 bg-bark/95 backdrop-blur z-40">
+    <div class="flex items-center gap-2 font-display text-lg font-semibold">
+      <span class="w-3 h-3 bg-gold" style="clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);"></span>
+      Ilha do Mel <span class="text-muted font-body text-sm font-normal ml-1">/ admin</span>
+    </div>
+    <span class="text-xs font-mono text-muted uppercase tracking-wide hidden sm:inline">Painel de demonstração</span>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-5 md:px-8 py-8 flex flex-col gap-10">
+
+    <!-- AVISO -->
+    <div class="bg-cell border border-line rounded-lg px-4 py-3 text-xs text-orange-300/90 font-mono">
+      ⚠ Ambiente de demonstração — dados financeiros são simulados. Alterações em produtos ficam salvas apenas neste navegador (localStorage) e não modificam o arquivo produtos.js original.
+    </div>
+
+    <!-- RESUMO FINANCEIRO -->
+    <section>
+      <h2 class="font-display text-xl font-semibold mb-4">Resumo financeiro</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-panel border border-line rounded-lg p-5">
+          <p class="text-xs text-muted uppercase tracking-wide mb-2 font-mono">Faturamento total</p>
+          <p id="stat-faturamento" class="font-display text-3xl font-bold text-gold">—</p>
+          <p class="text-xs text-muted mt-1">Últimos 30 dias (simulado)</p>
+        </div>
+        <div class="bg-panel border border-line rounded-lg p-5">
+          <p class="text-xs text-muted uppercase tracking-wide mb-2 font-mono">Pedidos realizados</p>
+          <p id="stat-pedidos" class="font-display text-3xl font-bold text-cream">—</p>
+          <p class="text-xs text-muted mt-1">Últimos 30 dias (simulado)</p>
+        </div>
+        <div class="bg-panel border border-line rounded-lg p-5">
+          <p class="text-xs text-muted uppercase tracking-wide mb-2 font-mono">Ticket médio</p>
+          <p id="stat-ticket" class="font-display text-3xl font-bold text-cream">—</p>
+          <p class="text-xs text-muted mt-1">Faturamento ÷ pedidos</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TABELA DE PRODUTOS -->
+    <section>
+      <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <h2 class="font-display text-xl font-semibold">Produtos cadastrados</h2>
+        <span id="produto-count" class="text-xs text-muted font-mono"></span>
+      </div>
+
+      <div class="bg-panel border border-line rounded-lg overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm min-w-[640px]">
+            <thead>
+              <tr class="border-b border-line text-left text-xs text-muted uppercase tracking-wide font-mono">
+                <th class="px-4 py-3">Produto</th>
+                <th class="px-4 py-3">Categoria</th>
+                <th class="px-4 py-3">Preço</th>
+                <th class="px-4 py-3">Estoque</th>
+                <th class="px-4 py-3 text-right">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-produtos"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- FORMULÁRIO NOVO PRODUTO -->
+    <section>
+      <h2 class="font-display text-xl font-semibold mb-4">Cadastrar novo produto</h2>
+      <form id="form-produto" class="bg-panel border border-line rounded-lg p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs text-muted font-mono uppercase tracking-wide">Nome</label>
+          <input type="text" id="input-nome" required placeholder="Ex: Mel de Mandaçaia"
+                 class="bg-cell border border-line rounded-md px-3 py-2 text-cream placeholder:text-muted/50 focus:outline-none focus:border-gold">
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs text-muted font-mono uppercase tracking-wide">Categoria</label>
+          <input type="text" id="input-categoria" required placeholder="Ex: Mel"
+                 class="bg-cell border border-line rounded-md px-3 py-2 text-cream placeholder:text-muted/50 focus:outline-none focus:border-gold">
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs text-muted font-mono uppercase tracking-wide">Preço (R$)</label>
+          <input type="number" id="input-preco" required min="0" step="0.01" placeholder="0,00"
+                 class="bg-cell border border-line rounded-md px-3 py-2 text-cream placeholder:text-muted/50 focus:outline-none focus:border-gold">
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs text-muted font-mono uppercase tracking-wide">Estoque</label>
+          <input type="number" id="input-estoque" required min="0" step="1" placeholder="0"
+                 class="bg-cell border border-line rounded-md px-3 py-2 text-cream placeholder:text-muted/50 focus:outline-none focus:border-gold">
+        </div>
+
+        <div class="flex flex-col gap-1.5 md:col-span-2">
+          <label class="text-xs text-muted font-mono uppercase tracking-wide">Descrição</label>
+          <textarea id="input-descricao" required rows="3" placeholder="Breve descrição do produto"
+                    class="bg-cell border border-line rounded-md px-3 py-2 text-cream placeholder:text-muted/50 focus:outline-none focus:border-gold resize-none"></textarea>
+        </div>
+
+        <div class="md:col-span-2 flex items-center gap-3">
+          <button type="submit" class="bg-gold hover:bg-goldDim text-bark font-medium px-5 py-2.5 rounded-md transition-colors">
+            Cadastrar produto
+          </button>
+          <span id="form-feedback" class="text-xs text-emerald-400 hidden">Produto adicionado (armazenado neste navegador).</span>
+        </div>
+      </form>
+    </section>
+
+  </main>
+
+  <script type="module">
+    import produtosBase from './produtos.js';
+
+    const ADMIN_STORAGE_KEY = 'ilha-do-mel-admin-produtos';
+    const PEDIDOS_STORAGE_KEY = 'ilha-do-mel-admin-pedidos-simulados';
+
+    // ---------------------------------------------------------------
+    // Estado: produtos = base do arquivo produtos.js + edições locais
+    // ---------------------------------------------------------------
+    let produtos = carregarProdutos();
+
+    function carregarProdutos() {
+      const salvos = localStorage.getItem(ADMIN_STORAGE_KEY);
+      if (salvos) {
+        try { return JSON.parse(salvos); } catch { /* ignora e recarrega base */ }
+      }
+      return structuredClone(produtosBase);
+    }
+
+    function salvarProdutos() {
+      localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(produtos));
+    }
+
+    // ---------------------------------------------------------------
+    // Financeiro simulado — gerado uma vez e fixado no localStorage,
+    // para não mudar a cada refresh da página (fica "estável" na demo).
+    // ---------------------------------------------------------------
+    function carregarPedidosSimulados() {
+      const salvos = localStorage.getItem(PEDIDOS_STORAGE_KEY);
+      if (salvos) return JSON.parse(salvos);
+
+      const totalPedidos = 18 + Math.floor(Math.random() * 12); // 18–29
+      const faturamento = Array.from({ length: totalPedidos })
+        .reduce(soma => soma + (35 + Math.random() * 90), 0);
+
+      const dados = {
+        totalPedidos,
+        faturamento: Number(faturamento.toFixed(2)),
+      };
+      localStorage.setItem(PEDIDOS_STORAGE_KEY, JSON.stringify(dados));
+      return dados;
+    }
+
+    function formatarMoeda(valor) {
+      return `R$ ${valor.toFixed(2).replace('.', ',')}`;
+    }
+
+    function renderResumoFinanceiro() {
+      const { totalPedidos, faturamento } = carregarPedidosSimulados();
+      const ticketMedio = totalPedidos > 0 ? faturamento / totalPedidos : 0;
+
+      document.getElementById('stat-faturamento').textContent = formatarMoeda(faturamento);
+      document.getElementById('stat-pedidos').textContent = totalPedidos;
+      document.getElementById('stat-ticket').textContent = formatarMoeda(ticketMedio);
+    }
+
+    // ---------------------------------------------------------------
+    // Tabela de produtos
+    // ---------------------------------------------------------------
+    function renderTabela() {
+      const tbody = document.getElementById('tabela-produtos');
+      const countEl = document.getElementById('produto-count');
+
+      countEl.textContent = `${produtos.length} produto${produtos.length !== 1 ? 's' : ''}`;
+
+      if (produtos.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-muted text-sm">Nenhum produto cadastrado.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = produtos.map(p => `
+        <tr class="border-b border-line last:border-0 hover:bg-cell/50 transition-colors" data-row="${p.id}">
+          <td class="px-4 py-3">
+            <p class="font-medium text-cream">${p.nome}</p>
+            <p class="text-xs text-muted truncate max-w-[220px]">${p.descricao}</p>
+          </td>
+          <td class="px-4 py-3 text-muted">${p.categoria}</td>
+          <td class="px-4 py-3">
+            <span class="preco-display font-mono text-gold">${formatarMoeda(p.preco)}</span>
+          </td>
+          <td class="px-4 py-3 text-muted">${p.estoque}</td>
+          <td class="px-4 py-3">
+            <div class="flex justify-end gap-2">
+              <button data-action="editar" data-id="${p.id}"
+                class="text-xs px-3 py-1.5 rounded-md border border-line text-muted hover:border-gold hover:text-gold transition-colors">
+                Editar preço
+              </button>
+              <button data-action="excluir" data-id="${p.id}"
+                class="text-xs px-3 py-1.5 rounded-md border border-red-900/60 text-red-400/80 hover:border-red-500 hover:text-red-400 transition-colors">
+                Excluir
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      tbody.querySelectorAll('[data-action="editar"]').forEach(btn => {
+        btn.addEventListener('click', () => iniciarEdicaoPreco(Number(btn.dataset.id)));
+      });
+      tbody.querySelectorAll('[data-action="excluir"]').forEach(btn => {
+        btn.addEventListener('click', () => excluirProduto(Number(btn.dataset.id)));
+      });
+    }
+
+    function iniciarEdicaoPreco(id) {
+      const linha = document.querySelector(`tr[data-row="${id}"]`);
+      const celulaPreco = linha.querySelector('.preco-display');
+      const produto = produtos.find(p => p.id === id);
+
+      celulaPreco.outerHTML = `
+        <span class="inline-flex items-center gap-1">
+          <input type="number" step="0.01" min="0" value="${produto.preco}"
+                 class="preco-input w-20 bg-cell border border-gold rounded px-2 py-1 text-cream text-sm focus:outline-none">
+          <button data-save="${id}" class="text-xs text-emerald-400 hover:text-emerald-300 px-1.5">✓</button>
+        </span>
+      `;
+
+      linha.querySelector(`[data-save="${id}"]`).addEventListener('click', () => salvarNovoPreco(id));
+      linha.querySelector('.preco-input').addEventListener('keydown', e => {
+        if (e.key === 'Enter') salvarNovoPreco(id);
+      });
+    }
+
+    function salvarNovoPreco(id) {
+      const linha = document.querySelector(`tr[data-row="${id}"]`);
+      const input = linha.querySelector('.preco-input');
+      const novoPreco = parseFloat(input.value);
+
+      if (isNaN(novoPreco) || novoPreco < 0) {
+        input.classList.add('border-red-500');
+        return;
+      }
+
+      const produto = produtos.find(p => p.id === id);
+      produto.preco = Number(novoPreco.toFixed(2));
+      salvarProdutos();
+      renderTabela();
+    }
+
+    function excluirProduto(id) {
+      const produto = produtos.find(p => p.id === id);
+      const confirmar = confirm(`Excluir "${produto.nome}"? Essa ação só afeta este navegador.`);
+      if (!confirmar) return;
+
+      produtos = produtos.filter(p => p.id !== id);
+      salvarProdutos();
+      renderTabela();
+    }
+
+    // ---------------------------------------------------------------
+    // Formulário de novo produto
+    // ---------------------------------------------------------------
+    document.getElementById('form-produto').addEventListener('submit', e => {
+      e.preventDefault();
+
+      const novoProduto = {
+        id: Date.now(), // simples e suficiente para uso local/demo
+        nome: document.getElementById('input-nome').value.trim(),
+        categoria: document.getElementById('input-categoria').value.trim(),
+        preco: Number(parseFloat(document.getElementById('input-preco').value).toFixed(2)),
+        descricao: document.getElementById('input-descricao').value.trim(),
+        imagem: '', // sem imagem definida — cai no fallback visual do catálogo
+        estoque: parseInt(document.getElementById('input-estoque').value, 10),
+      };
+
+      produtos.push(novoProduto);
+      salvarProdutos();
+      renderTabela();
+
+      e.target.reset();
+      const feedback = document.getElementById('form-feedback');
+      feedback.classList.remove('hidden');
+      setTimeout(() => feedback.classList.add('hidden'), 3000);
+    });
+
+    // ---------------------------------------------------------------
+    // Inicialização
+    // ---------------------------------------------------------------
+    renderResumoFinanceiro();
+    renderTabela();
+  </script>
+
+</body>
+</html>
