@@ -23,7 +23,7 @@ const produtos = [
     categoria: "Mel",
     preco: 65.00,
     descricao: "Mel de abelha Jataí, de sabor levemente ácido e textura mais líquida, muito valorizado por suas propriedades medicinais.",
-    imagem: "/imagens/mel-jatai.jpg",
+    imagem: "mel-jatai.jpg",
     estoque: 18
   },
   {
